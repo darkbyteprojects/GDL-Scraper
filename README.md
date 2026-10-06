@@ -130,3 +130,14 @@ pip install -r requirements.txt
 ```bash
 python gdl_full_scraper.py
 ```
+
+## 🌟 Support & Feedback
+
+- **Give a Star:** If you find this repository useful, please leave a **⭐ Star** to support the project and keep it alive!
+- **Report Issues:** If you have any issue, open an issue under the [Issues](../../issues) tab.
+
+---
+
+<p align="center">
+  <i>Maintained with ❤️ by <b>DarkByteProjects</b></i>
+</p>
