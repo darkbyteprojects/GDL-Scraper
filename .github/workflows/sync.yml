@@ -1,0 +1,50 @@
+name: GDL Builder
+
+on:
+  schedule:
+    # Runs every 30 minutes UTC
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+concurrency:
+  group: sync-streams
+  cancel-in-progress: true
+
+jobs:
+  update-endpoints:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests urllib3
+
+      - name: Execute scraper
+        run: |
+          python gdl_full_scraper.py
+
+      - name: Commit and push updated API datasets
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add jiotv_channels.json jiotv_resolved_streams.json gdl_app_metadata.json
+          
+          # Only commit if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes in stream tokens detected."
+          else
+            git commit -m "chore(api): auto-refresh stream keys and tokens [skip ci]"
+            git push origin HEAD
+          fi
