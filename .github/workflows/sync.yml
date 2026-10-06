@@ -1,8 +1,8 @@
-name: "Auto-Sync Stream Endpoints"
+name: "GDL Builder"
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 concurrency:
@@ -16,30 +16,32 @@ jobs:
       contents: write
 
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
-        uses: setup-python@v5
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install requests urllib3
 
-      - name: Execute scraper
+      - name: Run scraper
         run: |
           python gdl_full_scraper.py
 
-      - name: Commit and push updated API datasets
+      - name: Commit and push changes
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.email "actions@github.com"
           git config --local user.name "github-actions[bot]"
           git add jiotv_channels.json jiotv_resolved_streams.json gdl_app_metadata.json
           if git diff --staged --quiet; then
-            echo "No changes detected."
+            echo "No data changes detected."
           else
             git commit -m "chore(api): auto-refresh stream keys and tokens [skip ci]"
             git push origin HEAD
