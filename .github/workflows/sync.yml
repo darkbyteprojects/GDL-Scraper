@@ -1,10 +1,9 @@
-name: "GDL Builder"
+name: "Auto-Sync Stream Endpoints"
 
 on:
   schedule:
-    # Runs every 30 minutes UTC
-    - cron: '*/5 * * * *'
-  workflow_dispatch: # Allows manual trigger from GitHub UI
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
 
 concurrency:
   group: sync-streams
@@ -23,8 +22,7 @@ jobs:
       - name: Set up Python
         uses: setup-python@v5
         with:
-          python-version: '3.11'
-          cache: 'pip'
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
@@ -40,10 +38,8 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add jiotv_channels.json jiotv_resolved_streams.json gdl_app_metadata.json
-          
-          # Only commit if there are changes
           if git diff --staged --quiet; then
-            echo "No changes in stream tokens detected."
+            echo "No changes detected."
           else
             git commit -m "chore(api): auto-refresh stream keys and tokens [skip ci]"
             git push origin HEAD
