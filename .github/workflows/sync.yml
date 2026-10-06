@@ -1,4 +1,4 @@
-name: GDL Builder
+name: "GDL Builder"
 
 on:
   schedule:
