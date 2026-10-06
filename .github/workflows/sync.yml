@@ -40,9 +40,11 @@ jobs:
           git config --local user.email "actions@github.com"
           git config --local user.name "github-actions[bot]"
           git add jiotv_channels.json jiotv_resolved_streams.json gdl_app_metadata.json
+          
           if git diff --staged --quiet; then
             echo "No data changes detected."
           else
             git commit -m "chore(api): auto-refresh stream keys and tokens [skip ci]"
-            git push origin HEAD
+            git pull --rebase origin main
+            git push origin HEAD:main
           fi
