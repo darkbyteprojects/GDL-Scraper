@@ -47,7 +47,7 @@ Returns the complete catalog with all alternative video sources, active session 
 #### Response Example
 
 ```json
- {
+  {
     "name": "Channel Name",
     "slug": "channel-name",
     "category": "CategoryName",
