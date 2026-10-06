@@ -118,6 +118,8 @@ Provides underlying infrastructure URLs, push service identifiers, and global ch
 1. Clone repository:
 ```bash
 git clone https://github.com/darkbyteprojects/GDL-Scraper.git
+```
+```bash
 cd GDL-Scraper
 ```
 2. Install dependencies:
