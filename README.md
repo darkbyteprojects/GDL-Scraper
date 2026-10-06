@@ -4,18 +4,6 @@ An automated live stream catalog and token-resolution scraper. The dataset is re
 
 ---
 
-## 🚀 Live Raw Endpoints (GitHub Raw)
-
-You can consume these endpoints directly in any web player, IPTV player, or backend service via raw URLs:
-
-| Resource | Direct Raw URL |
-| :--- | :--- |
-| **All Resolved Streams** | `https://raw.githubusercontent.com/darkbyteprojects/GDL-Scraper/main/jiotv_resolved_streams.json` |
-| **Channel Catalog** | `https://raw.githubusercontent.com/darkbyteprojects/GDL-Scraper/main/jiotv_channels.json` |
-| **Service Metadata** | `https://raw.githubusercontent.com/darkbyteprojects/GDL-Scraper/main/gdl_app_metadata.json` |
-
----
-
 ## 📖 Scraper Documentation & Response Schemas
 
 ### 1. Resolved Streams Endpoint (`jiotv_resolved_streams.json`)
