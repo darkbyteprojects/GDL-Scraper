@@ -1,0 +1,11 @@
+{
+    "site_info": {
+        "api_base": "https://api.freeforall.dev",
+        "frontend_url": "https://livetv.lessqooquys.tech",
+        "push_service": {
+            "api_url": "https://notification.gdls.me",
+            "website_id": "LX6O1O00K"
+        }
+    },
+    "total_channels": 1073
+}
