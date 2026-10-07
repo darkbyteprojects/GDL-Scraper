@@ -1,7 +1,8 @@
 {
     "site_info": {
         "api_base": "https://api.freeforall.dev",
-        "frontend_url": "https://livetv.lessqooquys.tech",
+        "frontend_url": "https://livetv.lessgooguys.tech",
+        "gateway_url": "https://play.freeforall.dev",
         "push_service": {
             "api_url": "https://notification.gdls.me",
             "website_id": "LX6O1O00K"
