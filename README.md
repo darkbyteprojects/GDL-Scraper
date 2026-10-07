@@ -4,18 +4,16 @@ An automated live stream catalog and token-resolution scraper. The dataset is re
 
 ---
 
-<details open>
-<summary><h2>📖 Scraper Documentation & Response Schemas</h2></summary>
+## 📖 Scraper Documentation & Response Schemas
 
 <br>
 
-<details open>
-<summary><h3>1. Resolved Streams Endpoint (<code>jiotv_resolved_streams.json</code>)</h3></summary>
+### 1. Resolved Streams Endpoint (<code>jiotv_resolved_streams.json</code>)
 
 Returns the complete catalog with all alternative video sources, active session tokens, Widevine DRM key arrays, and proxy routing targets.
 
 <details>
-<summary><b>Schema Overview</b></summary>
+<summary>Schema Overview</summary>
 
 - `name` *(string)*: Display name of the channel.
 - `slug` *(string)*: Unique URL-safe identifier for the channel.
@@ -40,7 +38,7 @@ Returns the complete catalog with all alternative video sources, active session 
 </details>
 
 <details>
-<summary><b>Response Example</b></summary>
+<summary>Response Example</summary>
 
 ```json
 {
@@ -79,13 +77,12 @@ Returns the complete catalog with all alternative video sources, active session 
 
 </details>
 
-<details open>
-<summary><h3>2. Base Catalog Endpoint (<code>jiotv_channels.json</code>)</h3></summary>
+### 2. Base Catalog Endpoint (<code>jiotv_channels.json</code>)
 
 Clean list of all indexed channels without dynamic tokens. Useful for quick catalog rendering and client-side searching.
 
 <details>
-<summary><b>Response Example</b></summary>
+<summary>Response Example</summary>
 
 ```json
 {
@@ -99,15 +96,12 @@ Clean list of all indexed channels without dynamic tokens. Useful for quick cata
 
 </details>
 
-</details>
-
-<details open>
-<summary><h3>3. Service Metadata Endpoint (<code>gdl_app_metadata.json</code>)</h3></summary>
+### 3. Service Metadata Endpoint (<code>gdl_app_metadata.json</code>)
 
 Provides underlying infrastructure URLs, push service identifiers, and global channel counts.
 
 <details>
-<summary><b>Response Example</b></summary>
+<summary>Response Example</summary>
 
 ```json
 {
@@ -126,12 +120,7 @@ Provides underlying infrastructure URLs, push service identifiers, and global ch
 
 </details>
 
-</details>
-
-</details>
-
-<details open>
-<summary><h2>⚙️ Running Locally</h2></summary>
+## ⚙️ Running Locally
 
 <br>
 
@@ -159,15 +148,10 @@ python gdl_full_scraper.py
 
 </details>
 
-<details>
-<summary><h2>🌟 Support & Feedback</h2></summary>
-
-<br>
+## 🌟 Support & Feedback
 
 - **Give a Star:** If you find this repository useful, please leave a **⭐ Star** to support the project and keep it alive!
 - **Report Issues:** If you have any issue, open an issue under the [Issues](../../issues) tab.
-
-</details>
 
 ---
 
