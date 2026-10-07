@@ -8,9 +8,9 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 API_BASE = "https://api.freeforall.dev"
-FRONTEND_URL = "https://livetv.lessqooquys.tech"
+PERMANENT_GATEWAY = "https://play.freeforall.dev"
 
-# Optimized Connection Pool
+# Dedicated Session with connection pooling
 session = requests.Session()
 retries = Retry(
     total=3,
@@ -18,24 +18,61 @@ retries = Retry(
     status_forcelist=[429, 500, 502, 503, 504],
     raise_on_status=False,
 )
-adapter = HTTPAdapter(max_retries=retries, pool_connections=25, pool_maxsize=25)
+adapter = HTTPAdapter(
+    max_retries=retries, 
+    pool_connections=25, 
+    pool_maxsize=25
+)
 session.mount("https://", adapter)
 session.mount("http://", adapter)
 
-DEFAULT_HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/124.0.0.0 Safari/537.36"
-    ),
-    "Accept": "application/json, text/plain, */*",
-    "Origin": FRONTEND_URL,
-    "Referer": f"{FRONTEND_URL}/",
-}
+
+def resolve_dynamic_frontend_url():
+    """
+    Follows the permanent gateway's redirect to automatically obtain
+    the currently active frontend mirror domain on every run.
+    """
+    print(f"--- [Step 0: Detecting Active Frontend via {PERMANENT_GATEWAY}] ---")
+    try:
+        r = session.get(
+            PERMANENT_GATEWAY,
+            allow_redirects=True,
+            timeout=10,
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/124.0.0.0 Safari/537.36"
+                )
+            },
+        )
+        detected_url = r.url.rstrip("/")
+        # If redirected to a subpath like /browse or /watch, strip down to the domain root
+        from urllib.parse import urlparse
+        parsed = urlparse(detected_url)
+        clean_origin = f"{parsed.scheme}://{parsed.netloc}"
+        print(f"Active Frontend Detected: {clean_origin}\n")
+        return clean_origin
+    except Exception as e:
+        print(f"[!] Warning: Could not trace gateway redirect ({e}), using API base as fallback.")
+        return API_BASE
+
+
+def build_headers(frontend_url):
+    return {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Accept": "application/json, text/plain, */*",
+        "Origin": frontend_url,
+        "Referer": f"{frontend_url}/",
+    }
 
 
 def to_absolute_url(url_str):
-    """Converts relative proxy routes into full absolute URLs."""
+    """Expands relative proxy routes into full absolute URLs."""
     if not url_str or not isinstance(url_str, str):
         return url_str
     if url_str.startswith("/"):
@@ -43,8 +80,8 @@ def to_absolute_url(url_str):
     return url_str
 
 
-def sync_channels_and_metadata(catalog_path, metadata_path):
-    """Fetches the channel catalog and writes clean server metadata."""
+def sync_channels_and_metadata(catalog_path, metadata_path, headers, active_frontend):
+    """Fetches channel catalog and saves fresh metadata with the resolved frontend URL."""
     print("--- [Step 1: Syncing Fresh Channel Catalog from API] ---")
     fresh_channels = {}
     page = 1
@@ -55,7 +92,7 @@ def sync_channels_and_metadata(catalog_path, metadata_path):
         try:
             res = session.get(
                 f"{API_BASE}/api/jiotv/channels?page={page}",
-                headers=DEFAULT_HEADERS,
+                headers=headers,
                 timeout=18,
             )
             if res.status_code != 200:
@@ -81,16 +118,17 @@ def sync_channels_and_metadata(catalog_path, metadata_path):
 
             print(f"Catalog page {page}/{total_pages} downloaded.")
             page += 1
-            time.sleep(0.05)
+            time.sleep(0.04)
         except Exception as e:
             print(f"[!] Error fetching catalog page {page}: {e}")
             break
 
-    # Save metadata without category aggregations
+    # Save metadata with the automatically updated frontend URL
     metadata_content = {
         "site_info": {
             "api_base": API_BASE,
-            "frontend_url": FRONTEND_URL,
+            "frontend_url": active_frontend,
+            "gateway_url": PERMANENT_GATEWAY,
             "push_service": {
                 "api_url": "https://notification.gdls.me",
                 "website_id": "LX6O1O00K",
@@ -111,10 +149,8 @@ def sync_channels_and_metadata(catalog_path, metadata_path):
     return channel_list
 
 
-def fetch_all_channel_streams(slug):
-    """
-    Finds all stream instances for a channel (resolving multi-stream channels).
-    """
+def fetch_all_channel_streams(slug, headers):
+    """Finds all stream instances for a channel."""
     candidate_urls = [
         f"{API_BASE}/api/channels/{slug}/streams",
         f"{API_BASE}/api/channel/{slug}/streams",
@@ -126,7 +162,7 @@ def fetch_all_channel_streams(slug):
 
     for url in candidate_urls:
         try:
-            resp = session.get(url, headers=DEFAULT_HEADERS, timeout=12)
+            resp = session.get(url, headers=headers, timeout=12)
             if resp.status_code == 200:
                 payload = resp.json()
                 items = []
@@ -149,10 +185,8 @@ def fetch_all_channel_streams(slug):
     return list(discovered.values())
 
 
-def resolve_single_stream(slug, stream):
-    """
-    Resolves the live URL with a sufficient timeout (18s) to allow DRM tokens to mint.
-    """
+def resolve_single_stream(slug, stream, headers):
+    """Resolves stream URLs with proper timeouts."""
     stream_id = stream.get("id") or stream.get("stream_id")
     stream_name = stream.get("name") or stream.get("title", f"Stream {stream_id}")
 
@@ -162,7 +196,7 @@ def resolve_single_stream(slug, stream):
     resolve_url = f"{API_BASE}/api/channels/{slug}/streams/{stream_id}/resolve"
     for attempt in range(2):
         try:
-            res = session.get(resolve_url, headers=DEFAULT_HEADERS, timeout=18)
+            res = session.get(resolve_url, headers=headers, timeout=18)
             if res.status_code == 200:
                 data = res.json()
 
@@ -173,7 +207,6 @@ def resolve_single_stream(slug, stream):
                         or data.pop("stream_url", None)
                     )
 
-                    # Ensure proxy addresses include full domain
                     if data.get("proxy_url"):
                         data["proxy_url"] = to_absolute_url(data["proxy_url"])
                     if data.get("license_proxy_url"):
@@ -200,14 +233,14 @@ def resolve_single_stream(slug, stream):
     return None
 
 
-def process_channel(ch):
+def process_channel(ch, headers):
     """Processes all streams for a given channel."""
     slug = ch.get("slug")
-    raw_streams = fetch_all_channel_streams(slug)
+    raw_streams = fetch_all_channel_streams(slug, headers)
     resolved_streams = []
 
     for st in raw_streams:
-        resolved = resolve_single_stream(slug, st)
+        resolved = resolve_single_stream(slug, st, headers)
         if resolved and resolved.get("stream_url"):
             resolved_streams.append(resolved)
 
@@ -228,8 +261,12 @@ def run_pipeline(workers=8):
     resolved_file = os.path.join(base_dir, "jiotv_resolved_streams.json")
     metadata_file = os.path.join(base_dir, "gdl_app_metadata.json")
 
+    # Step 0: Resolve active frontend URL via permanent redirect gateway
+    active_frontend = resolve_dynamic_frontend_url()
+    headers = build_headers(active_frontend)
+
     # Step 1: Refresh channels & write fresh metadata
-    channels = sync_channels_and_metadata(catalog_file, metadata_file)
+    channels = sync_channels_and_metadata(catalog_file, metadata_file, headers, active_frontend)
 
     total = len(channels)
     print(f"--- [Step 2: Resolving Streams for {total} Channels ({workers} Stable Workers)] ---")
@@ -238,7 +275,7 @@ def run_pipeline(workers=8):
     completed = 0
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-        future_to_ch = {executor.submit(process_channel, ch): ch for ch in channels}
+        future_to_ch = {executor.submit(process_channel, ch, headers): ch for ch in channels}
 
         for future in concurrent.futures.as_completed(future_to_ch):
             completed += 1
@@ -260,5 +297,4 @@ def run_pipeline(workers=8):
 
 
 if __name__ == "__main__":
-    # 8 workers guarantees the server will not reject requests with 0 streams
     run_pipeline(workers=8)
