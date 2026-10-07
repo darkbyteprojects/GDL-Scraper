@@ -1,6 +1,8 @@
-# GDL Scraper
+# GDL Scraper | [![GDL Builder](https://github.com/darkbyteprojects/GDL-Scraper/actions/workflows/sync.yml/badge.svg)](https://github.com/darkbyteprojects/GDL-Scraper/actions/workflows/sync.yml)
 
 An automated live stream catalog and token-resolution scraper. The dataset is refreshed via GitHub Actions to maintain valid HMAC authentication sessions and token signatures for MPEG-DASH and HLS playback.
+
+
 
 ---
 
