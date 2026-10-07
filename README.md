@@ -92,6 +92,7 @@ Provides underlying infrastructure URLs, push service identifiers, and global ch
     "site_info": {
       "api_base": "https://example.com",
       "frontend_url": "https://example.com",
+      "gateway_url": "https://example.com",
       "push_service": {
         "api_url": "https://example.com",
         "website_id": "XXXXXXX"
