@@ -2,17 +2,20 @@
 
 An automated live stream catalog and token-resolution scraper. The dataset is refreshed via GitHub Actions to maintain valid HMAC authentication sessions and token signatures for MPEG-DASH and HLS playback.
 
-
-
 ---
 
-## 📖 Scraper Documentation & Response Schemas
+<details open>
+<summary><h2>📖 Scraper Documentation & Response Schemas</h2></summary>
 
-### 1. Resolved Streams Endpoint (`jiotv_resolved_streams.json`)
+<br>
+
+<details open>
+<summary><h3>1. Resolved Streams Endpoint (<code>jiotv_resolved_streams.json</code>)</h3></summary>
 
 Returns the complete catalog with all alternative video sources, active session tokens, Widevine DRM key arrays, and proxy routing targets.
 
-#### Schema Overview
+<details>
+<summary><b>Schema Overview</b></summary>
 
 - `name` *(string)*: Display name of the channel.
 - `slug` *(string)*: Unique URL-safe identifier for the channel.
@@ -34,98 +37,137 @@ Returns the complete catalog with all alternative video sources, active session 
     - `jio` *(boolean)*: Whether the source stream is an official Jio CDN endpoint.
     - `cached` *(boolean)*: Indicates if the URL was resolved via backend cache.
 
-#### Response Example
+</details>
+
+<details>
+<summary><b>Response Example</b></summary>
 
 ```json
-  {
-    "name": "Channel Name",
-    "slug": "channel-name",
-    "category": "CategoryName",
-    "language": "en",
-    "logo": "https://example.com/image.png",
-    "streams_count": X,
-    "streams": [
-      {
-        "stream_id": xxxxxx,
-        "stream_name": "Stream xxxxxx",
-        "stream_url": "https://example.com/stream.mpd",
-        "details": {
-          "needs_proxy": true/false,
-          "headers": null,
-          "drm_key": [
-            {
-              "kid": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-              "key": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-            }
-          ],
-          "license_key_url": "https://example.com/key?id=XXX",
-          "jio": true/false,
-          "cached": true/false,
-          "proxy_url": "https://example.com",
-          "license_proxy_url": "https://example.com/proxy?resource=abcd"
-        }
-      },
-    ]
-  }
-````
+{
+  "name": "Channel Name",
+  "slug": "channel-name",
+  "category": "CategoryName",
+  "language": "en",
+  "logo": "https://example.com/image.png",
+  "streams_count": X,
+  "streams": [
+    {
+      "stream_id": xxxxxx,
+      "stream_name": "Stream xxxxxx",
+      "stream_url": "https://example.com/stream.mpd",
+      "details": {
+        "needs_proxy": true/false,
+        "headers": null,
+        "drm_key": [
+          {
+            "kid": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "key": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          }
+        ],
+        "license_key_url": "https://example.com/key?id=XXX",
+        "jio": true/false,
+        "cached": true/false,
+        "proxy_url": "https://example.com",
+        "license_proxy_url": "https://example.com/proxy?resource=abcd"
+      }
+    }
+  ]
+}
+```
 
-### 2. Base Catalog Endpoint (`jiotv_channels.json`)
+</details>
+
+</details>
+
+<details open>
+<summary><h3>2. Base Catalog Endpoint (<code>jiotv_channels.json</code>)</h3></summary>
+
 Clean list of all indexed channels without dynamic tokens. Useful for quick catalog rendering and client-side searching.
 
-#### Response Example
+<details>
+<summary><b>Response Example</b></summary>
 
-````json
-  {
-    "name": "Channel Name",
-    "slug": "channel-name",
-    "category": "CategoryName",
-    "language": "en",
-    "logo": "https://exapmle.com/image.png"
-  },
-````
+```json
+{
+  "name": "Channel Name",
+  "slug": "channel-name",
+  "category": "CategoryName",
+  "language": "en",
+  "logo": "https://example.com/image.png"
+}
+```
 
-### 3. Service Metadata Endpoint (`gdl_app_metadata.json`)
+</details>
+
+</details>
+
+<details open>
+<summary><h3>3. Service Metadata Endpoint (<code>gdl_app_metadata.json</code>)</h3></summary>
+
 Provides underlying infrastructure URLs, push service identifiers, and global channel counts.
 
-#### Response Example
+<details>
+<summary><b>Response Example</b></summary>
 
-````json
-  {
-    "site_info": {
-      "api_base": "https://example.com",
-      "frontend_url": "https://example.com",
-      "gateway_url": "https://example.com",
-      "push_service": {
-        "api_url": "https://example.com",
-        "website_id": "XXXXXXX"
-      }
-    },
-    "total_channels": XXXX
-  }
-````
+```json
+{
+  "site_info": {
+    "api_base": "https://example.com",
+    "frontend_url": "https://example.com",
+    "gateway_url": "https://example.com",
+    "push_service": {
+      "api_url": "https://example.com",
+      "website_id": "XXXXXXX"
+    }
+  },
+  "total_channels": XXXX
+}
+```
 
-## ⚙️ Running Locally
+</details>
+
+</details>
+
+</details>
+
+<details open>
+<summary><h2>⚙️ Running Locally</h2></summary>
+
+<br>
 
 1. Clone repository:
+
 ```bash
 git clone https://github.com/darkbyteprojects/GDL-Scraper.git
 ```
+
 ```bash
 cd GDL-Scraper
 ```
+
 2. Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
+
 3. Run pipeline manually:
+
 ```bash
 python gdl_full_scraper.py
 ```
 
-## 🌟 Support & Feedback
+</details>
+
+<details>
+<summary><h2>🌟 Support & Feedback</h2></summary>
+
+<br>
 
 - **Give a Star:** If you find this repository useful, please leave a **⭐ Star** to support the project and keep it alive!
 - **Report Issues:** If you have any issue, open an issue under the [Issues](../../issues) tab.
+
+</details>
 
 ---
 
