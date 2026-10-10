@@ -156,5 +156,5 @@ python gdl_full_scraper.py
 ---
 
 <p align="center">
-  <i>Maintained with ❤️ by <b>DarkByteProjects</b></i>
+  <i>Made with ❤️ by <b>DarkByteProjects</b></i>
 </p>
